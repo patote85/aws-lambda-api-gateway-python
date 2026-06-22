@@ -1,2 +1,9 @@
-# aws-lambda-api-gateway-python
-Arquitetura serverless completa: API Gateway + Lambda Python + DynamoDB (com testes)
+# AWS Lambda + API Gateway Python
+
+Arquitetura serverless completa com testes unitários.
+
+## Deploy
+cdk deploy
+
+## Testes
+pytest tests/
