@@ -1,21 +1,20 @@
-# Lambda Exclusão de Cliente com Pix
+# AWS Lambda Exclusão Cliente
 
-## Funcionalidades
-- POST /solicitar-exclusao-cliente : Inicia processo de exclusão + gera QR Pix para tarifa
-- GET /status-exclusao/{cliente_id} : Consulta status
-- POST /confirmar-pagamento : Confirma pagamento e avança exclusão
+## Integração com API Gateway
+Ver repositório: https://github.com/patote85/aws-api-gateway-cdk
 
-## Resiliência & Idempotência
-- Idempotency via Powertools + DynamoDB check
-- Error handling + logging estruturado
-- DLQ recomendado no Lambda
+## Exemplos de Requisições
 
-## Observabilidade
-- Powertools Metrics + Logger (forward to Datadog via extension)
-- Recomendado: Datadog Lambda Extension + ddtrace
+### 1. Solicitar Exclusão
+```bash
+curl -X POST https://api.exemplo.com/solicitar-exclusao-cliente \
+  -H 'Content-Type: application/json' \
+  -d '{"cliente_id": "12345", "motivo": "Pedido do cliente"}'
+```
 
-## Deploy
-cdk deploy
+### 2. Status
+```bash
+curl https://api.exemplo.com/status-exclusao/12345
+```
 
-## Testes
-pytest tests/
+Link para API Gateway repo: https://github.com/patote85/aws-api-gateway-cdk
