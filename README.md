@@ -1,4 +1,4 @@
-# ... (conteúdo anterior)
+# ... (evolução)
 
-## Lambda Authorizer
-Implementado autorizador simples por token. Em produção use Cognito ou JWT completo.
+## Melhoria: Versionamento de API + Deprecation
+Adicionado suporte a versionamento e deprecation.
