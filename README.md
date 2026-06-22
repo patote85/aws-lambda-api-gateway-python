@@ -1,4 +1,4 @@
-# ... (conteúdo anterior)
+# ... (evolução do README)
 
-## Lambda Authorizer
-Implementado autorizador simples por token. Em produção use Cognito ou JWT completo.
+## Melhoria: Padrões de Resiliência na Lambda
+Adicionado Retry com backoff + Circuit Breaker simples.
