@@ -1,2 +1,3 @@
 aws-lambda-powertools[all]
 boto3
+qrcode  # for real QR if needed
