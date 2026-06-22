@@ -1,4 +1,4 @@
-# ... (conteúdo anterior)
+# ... (evolução)
 
-## Lambda Authorizer
-Implementado autorizador simples por token. Em produção use Cognito ou JWT completo.
+## Melhoria: Graceful Degradation + Preparação para Chaos Testing
+Implementado fallback e preparação para FIS.
