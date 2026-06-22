@@ -1,21 +1,32 @@
 # AWS Lambda Exclusão de Cliente com Pix
 
-## Evolução da Resiliência na Lambda
+## Descrição Funcional
+API serverless para solicitação de exclusão de cliente com pagamento de tarifa via Pix.
 
-### Melhorias Implementadas
+## Casos de Uso
+- Cliente solicita exclusão do cadastro
+- Geração de QR Code Pix para tarifa
+- Confirmação de pagamento libera a exclusão
+- Consulta de status em tempo real
 
-**1. Padrões de Resiliência**
-- Retry com backoff + Circuit Breaker
+## Tecnologias Utilizadas
+- **Linguagem**: Python 3.12
+- **IA**: Grok (xAI) no modo Capitão absoluto
+- **Ferramentas**: Agent Toolkit for AWS (MCP Server), Powertools for AWS Lambda (Logger, Tracer, Metrics, Idempotency, Validation)
+- **Bibliotecas**: boto3, Pydantic, tenacity (para retry)
+- **AWS Services**: API Gateway, Lambda, DynamoDB, (futuro: FIS, Resilience Hub, Systems Manager)
+- **CI/CD**: GitHub Actions
 
-**2. Health Check + Métricas**
-- Endpoint de saúde + métricas de resiliência
+## Exemplos de Requisições
 
-**3. Graceful Degradation**
-- Fallbacks e preparação para Chaos Testing (FIS)
+POST /solicitar-exclusao-cliente
+```bash
+curl -X POST https://seu-api.../solicitar-exclusao-cliente \
+  -H 'Content-Type: application/json' \
+  -d '{"cliente_id": "12345", "motivo": "Pedido do cliente"}'
+```
 
-**4. Versionamento de API**
-- Suporte a versionamento e deprecation
+## Instruções de Geração de READMEs Futuros
+Ver README_TEMPLATE.md
 
-**Status**: Merge completo das 4 melhorias de resiliência na Lambda.
-
-Todo o conteúdo anterior foi preservado e evoluído.
+**Gerado por Grok - Capitão da Verdade**
