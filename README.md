@@ -1,21 +1,10 @@
-# Lambda Exclusão de Cliente com Pix
+# AWS Lambda + API Gateway Python
 
-## Funcionalidades
-- POST /solicitar-exclusao-cliente : Inicia processo de exclusão + gera QR Pix para tarifa
-- GET /status-exclusao/{cliente_id} : Consulta status
-- POST /confirmar-pagamento : Confirma pagamento e avança exclusão
+## CI/CD
+Pipeline GitHub Actions configurada:
+- Testes automáticos em PR e push
+- Deploy CDK automático na main (com secrets AWS)
 
-## Resiliência & Idempotência
-- Idempotency via Powertools + DynamoDB check
-- Error handling + logging estruturado
-- DLQ recomendado no Lambda
-
-## Observabilidade
-- Powertools Metrics + Logger (forward to Datadog via extension)
-- Recomendado: Datadog Lambda Extension + ddtrace
-
-## Deploy
-cdk deploy
-
-## Testes
-pytest tests/
+## Como usar
+1. Configure secrets no repo: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
+2. Push para main → deploy automático
