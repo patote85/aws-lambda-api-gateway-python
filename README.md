@@ -1,4 +1,4 @@
-# ... (conteúdo anterior)
+# ... (evolução)
 
-## Lambda Authorizer
-Implementado autorizador simples por token. Em produção use Cognito ou JWT completo.
+## Melhoria: Health Check + Métricas de Resiliência
+Adicionado endpoint de health e métricas específicas.
