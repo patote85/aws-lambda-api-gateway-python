@@ -1,1 +1,1 @@
-# CDK stack example - complete in next step
+# CDK Stack completo - expandir com table, lambda role etc.
