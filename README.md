@@ -44,3 +44,5 @@ PYTHONPATH=. pytest tests/test_exclusao.py -v
 ```
 
 Usa **moto** (sem AWS real). O pacote `lambda/` importa via `importlib` (nome reservado).
+
+CI (GitHub Actions): mesmo comando em Python 3.12 em todo PR/`push` na `main` — sem credenciais AWS no runner.
