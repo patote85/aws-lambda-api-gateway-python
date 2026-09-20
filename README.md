@@ -51,12 +51,14 @@ CI (GitHub Actions): mesmo comando em Python 3.12 em todo PR/`push` na `main` �
 
 ## CDK / Deploy
 
-Stack único em `cdk/app.py` (ADR-001 PR2): **DynamoDB + Lambda + HTTP API** no mesmo stack — sem `from_function_name`, sem Cognito (PR3).
+Stack único em `cdk/app.py` (ADR-001): **Cognito + DynamoDB + Lambda + HTTP API** no mesmo stack — sem `from_function_name`.
 
 - Tabela: PK `cliente_id` / SK `request_id`, on-demand; `grant_read_write_data` na Lambda.
 - Env: `TABLE_NAME` (nome da tabela), `PIX_FEE` (default `50.00`).
 - Handler: `app.lambda_handler` (código em `lambda/`).
-- Throttle HTTP API: **100 rps / burst 200** (espelha `aws-api-gateway-cdk`).
+- Throttle HTTP API: **100 rps / burst 200**.
+- Auth: Cognito JWT nas rotas mutáveis/status; **`GET /health` público**.
+- CORS lab: `http://localhost:3000` e `http://127.0.0.1:3000` (sem `*`). Override via CDK context `corsOrigins` (lista de origins).
 - Rotas: `POST /solicitar-exclusao-cliente`, `GET /status-exclusao/{cliente_id}`, `POST /confirmar-pagamento`, `GET /health`.
 
 ```bash
@@ -66,4 +68,57 @@ npx aws-cdk@2 synth    # requer Node + AWS CDK CLI
 # npx aws-cdk@2 deploy  # só com CAB / conta lab
 ```
 
+Outputs úteis após deploy: `ApiUrl`, `UserPoolId`, `UserPoolClientId`, `JwtIssuer`.
+
 **Nota:** o asset Lambda é o source em `lambda/` — empacotar Powertools (layer ou bundle) fica em follow-up; este PR só faz o wiring IaC.
+
+---
+
+## Cognito JWT — obter token e testar (lab)
+
+Após `cdk deploy` (com CAB), anote `UserPoolId`, `UserPoolClientId` e `ApiUrl`.
+
+### 1) Criar usuário (lab)
+
+```bash
+aws cognito-idp sign-up \
+  --client-id "$CLIENT_ID" \
+  --username "lab@example.com" \
+  --password 'LabPass123' \
+  --user-attributes Name=email,Value=lab@example.com
+
+# Confirmar (lab — admin; self-sign-up exige confirmação de e-mail ou admin-confirm)
+aws cognito-idp admin-confirm-sign-up \
+  --user-pool-id "$USER_POOL_ID" \
+  --username "lab@example.com"
+```
+
+### 2) Obter IdToken
+
+```bash
+aws cognito-idp initiate-auth \
+  --client-id "$CLIENT_ID" \
+  --auth-flow USER_PASSWORD_AUTH \
+  --auth-parameters USERNAME=lab@example.com,PASSWORD='LabPass123'
+```
+
+Use o campo `AuthenticationResult.IdToken` (não o AccessToken) no header.
+
+### 3) Chamar API
+
+```bash
+# Público
+curl -s "$API_URL/health"
+
+# Protegido
+PAYLOAD='{"cliente_id":"c1","motivo":"lab"}'
+curl -s -X POST "$API_URL/solicitar-exclusao-cliente" \
+  -H "Authorization: Bearer $ID_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "$PAYLOAD"
+
+curl -s "$API_URL/status-exclusao/c1" \
+  -H "Authorization: Bearer $ID_TOKEN"
+```
+
+Sem Bearer nas rotas protegidas → API Gateway responde **401** antes da Lambda.
