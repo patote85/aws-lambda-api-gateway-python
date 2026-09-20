@@ -46,3 +46,24 @@ PYTHONPATH=. pytest tests/test_exclusao.py -v
 Usa **moto** (sem AWS real). O pacote `lambda/` importa via `importlib` (nome reservado).
 
 CI (GitHub Actions): mesmo comando em Python 3.12 em todo PR/`push` na `main` — sem credenciais AWS no runner.
+
+---
+
+## CDK / Deploy
+
+Stack único em `cdk/app.py` (ADR-001 PR2): **DynamoDB + Lambda + HTTP API** no mesmo stack — sem `from_function_name`, sem Cognito (PR3).
+
+- Tabela: PK `cliente_id` / SK `request_id`, on-demand; `grant_read_write_data` na Lambda.
+- Env: `TABLE_NAME` (nome da tabela), `PIX_FEE` (default `50.00`).
+- Handler: `app.lambda_handler` (código em `lambda/`).
+- Throttle HTTP API: **100 rps / burst 200** (espelha `aws-api-gateway-cdk`).
+- Rotas: `POST /solicitar-exclusao-cliente`, `GET /status-exclusao/{cliente_id}`, `POST /confirmar-pagamento`, `GET /health`.
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r cdk/requirements.txt
+npx aws-cdk@2 synth    # requer Node + AWS CDK CLI
+# npx aws-cdk@2 deploy  # só com CAB / conta lab
+```
+
+**Nota:** o asset Lambda é o source em `lambda/` — empacotar Powertools (layer ou bundle) fica em follow-up; este PR só faz o wiring IaC.
