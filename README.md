@@ -21,15 +21,16 @@ API serverless para solicitação de exclusão de cliente com geração de QR Co
 
 Tabela: PK `cliente_id`, SK `request_id`.
 
-Cada solicitação grava **dois** itens (TransactWrite):
+Cada solicitação grava **dois** itens (histórico depois ponteiro):
 
 | SK | Papel |
 |----|--------|
-| UUID da solicitação | Histórico imutável daquele pedido |
+| UUID da solicitação | Histórico daquele pedido |
 | `LATEST` | Ponteiro do estado atual (`active_request_id`, `status`, …) |
 
-- **Dedup / status** leem só `LATEST` (não mais um UUID que nunca existia como SK=`LATEST`).
-- **Confirmar pagamento** atualiza histórico + `LATEST` no mesmo TransactWrite (só se `active_request_id` bater).
+- **Dedup / status** leem só `LATEST` (antes o código gravava UUID e lia SK=`LATEST` — nunca achava).
+- **Confirmar pagamento** atualiza histórico e depois `LATEST` (condition em `active_request_id`).
+- Writes ordenados (`put`/`update`) de propósito neste PR — TransactWrite fica pra um follow-up se precisar atomicidade forte.
 
 ### Testes
 
@@ -38,4 +39,4 @@ pip install -r requirements.txt
 PYTHONPATH=. pytest tests/test_exclusao.py -v
 ```
 
-Usa **moto** (sem AWS real).
+Usa **moto** (sem AWS real). O pacote `lambda/` importa via `importlib` (nome reservado).
