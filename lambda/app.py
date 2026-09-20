@@ -8,7 +8,6 @@ import uuid
 import os
 from datetime import datetime, timedelta
 from decimal import Decimal
-from boto3.dynamodb.types import TypeSerializer
 
 logger = Logger(service="exclusao-cliente-lambda")
 tracer = Tracer()
@@ -21,12 +20,6 @@ LATEST_SK = "LATEST"
 
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(TABLE_NAME)
-_ddb_client = dynamodb.meta.client
-_serializer = TypeSerializer()
-
-
-def _serialize_item(item: dict) -> dict:
-    return {k: _serializer.serialize(v) for k, v in item.items()}
 
 
 def _get_latest(cliente_id: str) -> dict | None:
@@ -45,7 +38,11 @@ def _put_solicitacao_with_latest(
     created_at: str,
     expires_at: str,
 ) -> None:
-    """Atomically write history (SK=uuid) + LATEST pointer (SK=LATEST)."""
+    """Write history (SK=uuid) then LATEST pointer (SK=LATEST).
+
+    Ordered puts keep the PR small and moto-friendly. TransactWrite can
+    replace this later if we need stronger atomicity.
+    """
     history = {
         "cliente_id": cliente_id,
         "request_id": request_id,
@@ -67,62 +64,30 @@ def _put_solicitacao_with_latest(
         "created_at": created_at,
         "expires_at": expires_at,
     }
-    _ddb_client.transact_write_items(
-        TransactItems=[
-            {
-                "Put": {
-                    "TableName": TABLE_NAME,
-                    "Item": _serialize_item(history),
-                }
-            },
-            {
-                "Put": {
-                    "TableName": TABLE_NAME,
-                    "Item": _serialize_item(latest),
-                }
-            },
-        ]
-    )
+    table.put_item(Item=history)
+    table.put_item(Item=latest)
 
 
 def _confirm_payment(cliente_id: str, request_id: str) -> None:
     """Mark history + LATEST as PAID when pointer matches request_id."""
     ts = datetime.utcnow().isoformat()
-    _ddb_client.transact_write_items(
-        TransactItems=[
-            {
-                "Update": {
-                    "TableName": TABLE_NAME,
-                    "Key": _serialize_item(
-                        {"cliente_id": cliente_id, "request_id": request_id}
-                    ),
-                    "UpdateExpression": "SET #status = :paid, updated_at = :ts",
-                    "ExpressionAttributeNames": {"#status": "status"},
-                    "ExpressionAttributeValues": _serialize_item(
-                        {":paid": "PAID", ":ts": ts}
-                    ),
-                    "ConditionExpression": "attribute_exists(cliente_id)",
-                }
-            },
-            {
-                "Update": {
-                    "TableName": TABLE_NAME,
-                    "Key": _serialize_item(
-                        {"cliente_id": cliente_id, "request_id": LATEST_SK}
-                    ),
-                    "UpdateExpression": "SET #status = :paid, updated_at = :ts",
-                    "ExpressionAttributeNames": {"#status": "status"},
-                    "ExpressionAttributeValues": _serialize_item(
-                        {
-                            ":paid": "PAID",
-                            ":ts": ts,
-                            ":rid": request_id,
-                        }
-                    ),
-                    "ConditionExpression": "active_request_id = :rid",
-                }
-            },
-        ]
+    table.update_item(
+        Key={"cliente_id": cliente_id, "request_id": request_id},
+        UpdateExpression="SET #status = :paid, updated_at = :ts",
+        ExpressionAttributeNames={"#status": "status"},
+        ExpressionAttributeValues={":paid": "PAID", ":ts": ts},
+        ConditionExpression="attribute_exists(cliente_id)",
+    )
+    table.update_item(
+        Key={"cliente_id": cliente_id, "request_id": LATEST_SK},
+        UpdateExpression="SET #status = :paid, updated_at = :ts",
+        ExpressionAttributeNames={"#status": "status"},
+        ExpressionAttributeValues={
+            ":paid": "PAID",
+            ":ts": ts,
+            ":rid": request_id,
+        },
+        ConditionExpression="active_request_id = :rid",
     )
 
 
