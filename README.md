@@ -58,7 +58,7 @@ Stack único em `cdk/app.py` (ADR-001): **Cognito + DynamoDB + Lambda + HTTP API
 - Handler: `app.lambda_handler` (código em `lambda/`).
 - Throttle HTTP API: **100 rps / burst 200**.
 - Auth: Cognito JWT nas rotas mutáveis/status; **`GET /health` público**.
-- CORS lab: `http://localhost:3000` e `http://127.0.0.1:3000` (sem `*`). Override: `-c corsOrigins='[\"https://seu-front\"]'`.
+- CORS lab: `http://localhost:3000` e `http://127.0.0.1:3000` (sem `*`). Override via CDK context `corsOrigins` (lista de origins).
 - Rotas: `POST /solicitar-exclusao-cliente`, `GET /status-exclusao/{cliente_id}`, `POST /confirmar-pagamento`, `GET /health`.
 
 ```bash
@@ -111,10 +111,11 @@ Use o campo `AuthenticationResult.IdToken` (não o AccessToken) no header.
 curl -s "$API_URL/health"
 
 # Protegido
+PAYLOAD='{"cliente_id":"c1","motivo":"lab"}'
 curl -s -X POST "$API_URL/solicitar-exclusao-cliente" \
   -H "Authorization: Bearer $ID_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{\"cliente_id\":\"c1\",\"motivo\":\"lab\"}'
+  -d "$PAYLOAD"
 
 curl -s "$API_URL/status-exclusao/c1" \
   -H "Authorization: Bearer $ID_TOKEN"
