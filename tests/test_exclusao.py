@@ -3,8 +3,11 @@ Moto tests for DynamoDB LATEST pointer + history alignment.
 
     pip install -r requirements.txt
     PYTHONPATH=. pytest tests/test_exclusao.py -v
+
+Note: package dir is named `lambda` (reserved word) — import via importlib.
 """
 
+import importlib
 import os
 import sys
 from decimal import Decimal
@@ -12,6 +15,7 @@ from pathlib import Path
 
 import boto3
 import pytest
+from botocore.exceptions import ClientError
 from moto import mock_aws
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -24,6 +28,10 @@ os.environ["AWS_ACCESS_KEY_ID"] = "testing"
 os.environ["AWS_SECRET_ACCESS_KEY"] = "testing"
 os.environ["POWERTOOLS_TRACE_DISABLED"] = "true"
 os.environ["POWERTOOLS_METRICS_NAMESPACE"] = "ExclusaoClienteTest"
+
+
+def _app():
+    return importlib.import_module("lambda.app")
 
 
 @pytest.fixture
@@ -43,8 +51,7 @@ def dynamodb_table():
             BillingMode="PAY_PER_REQUEST",
         )
 
-        import lambda.app as app_module
-
+        app_module = _app()
         app_module.TABLE_NAME = "ExclusaoClientes"
         app_module.table = tbl
         app_module.dynamodb = ddb
@@ -54,9 +61,9 @@ def dynamodb_table():
 
 
 def test_put_creates_latest_and_history(dynamodb_table):
-    from lambda.app import _put_solicitacao_with_latest, _get_latest, LATEST_SK
+    app = _app()
 
-    _put_solicitacao_with_latest(
+    app._put_solicitacao_with_latest(
         cliente_id="c1",
         request_id="req-aaa",
         motivo="teste",
@@ -66,9 +73,9 @@ def test_put_creates_latest_and_history(dynamodb_table):
         expires_at="2026-01-08T00:00:00",
     )
 
-    latest = _get_latest("c1")
+    latest = app._get_latest("c1")
     assert latest is not None
-    assert latest["request_id"] == LATEST_SK
+    assert latest["request_id"] == app.LATEST_SK
     assert latest["active_request_id"] == "req-aaa"
     assert latest["status"] == "PENDING_PAYMENT"
 
@@ -80,19 +87,13 @@ def test_put_creates_latest_and_history(dynamodb_table):
 
 
 def test_get_latest_missing(dynamodb_table):
-    from lambda.app import _get_latest
-
-    assert _get_latest("nobody") is None
+    assert _app()._get_latest("nobody") is None
 
 
 def test_confirm_payment_updates_latest_and_history(dynamodb_table):
-    from lambda.app import (
-        _put_solicitacao_with_latest,
-        _confirm_payment,
-        _get_latest,
-    )
+    app = _app()
 
-    _put_solicitacao_with_latest(
+    app._put_solicitacao_with_latest(
         cliente_id="c2",
         request_id="req-bbb",
         motivo="ok",
@@ -101,9 +102,9 @@ def test_confirm_payment_updates_latest_and_history(dynamodb_table):
         created_at="2026-01-01T00:00:00",
         expires_at="2026-01-08T00:00:00",
     )
-    _confirm_payment("c2", "req-bbb")
+    app._confirm_payment("c2", "req-bbb")
 
-    latest = _get_latest("c2")
+    latest = app._get_latest("c2")
     assert latest["status"] == "PAID"
     assert latest["active_request_id"] == "req-bbb"
 
@@ -115,10 +116,9 @@ def test_confirm_payment_updates_latest_and_history(dynamodb_table):
 
 
 def test_confirm_payment_wrong_request_fails(dynamodb_table):
-    from lambda.app import _put_solicitacao_with_latest, _confirm_payment
-    from botocore.exceptions import ClientError
+    app = _app()
 
-    _put_solicitacao_with_latest(
+    app._put_solicitacao_with_latest(
         cliente_id="c3",
         request_id="req-ccc",
         motivo="ok",
@@ -128,4 +128,4 @@ def test_confirm_payment_wrong_request_fails(dynamodb_table):
         expires_at="2026-01-08T00:00:00",
     )
     with pytest.raises(ClientError):
-        _confirm_payment("c3", "req-WRONG")
+        app._confirm_payment("c3", "req-WRONG")
