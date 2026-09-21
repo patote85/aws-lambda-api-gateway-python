@@ -4,7 +4,8 @@ Moto tests for DynamoDB LATEST pointer + history alignment.
     pip install -r requirements.txt
     PYTHONPATH=. pytest tests/test_exclusao.py -v
 
-Note: package dir is named `lambda` (reserved word) — import via importlib.
+Import style matches Lambda Code.from_asset("lambda"): app + domain_dynamo
+as top-level modules (lambda/ on sys.path).
 """
 
 import importlib
@@ -19,7 +20,9 @@ from botocore.exceptions import ClientError
 from moto import mock_aws
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
+LAMBDA_DIR = ROOT / "lambda"
+# Same layout as the Lambda zip root
+sys.path.insert(0, str(LAMBDA_DIR))
 
 os.environ["TABLE_NAME"] = "ExclusaoClientes"
 os.environ["PIX_FEE"] = "50.00"
@@ -31,7 +34,11 @@ os.environ["POWERTOOLS_METRICS_NAMESPACE"] = "ExclusaoClienteTest"
 
 
 def _app():
-    return importlib.import_module("lambda.app")
+    return importlib.import_module("app")
+
+
+def _domain():
+    return importlib.import_module("domain_dynamo")
 
 
 @pytest.fixture
@@ -51,11 +58,19 @@ def dynamodb_table():
             BillingMode="PAY_PER_REQUEST",
         )
 
+        domain = _domain()
+        domain.TABLE_NAME = "ExclusaoClientes"
+        domain.table = tbl
+        domain.dynamodb = ddb
+
         app_module = _app()
-        app_module.TABLE_NAME = "ExclusaoClientes"
-        app_module.table = tbl
-        app_module.dynamodb = ddb
-        app_module._ddb_client = ddb.meta.client
+        app_module.TABLE_NAME = domain.TABLE_NAME
+        app_module.table = domain.table
+        app_module.dynamodb = domain.dynamodb
+        app_module.LATEST_SK = domain.LATEST_SK
+        app_module._get_latest = domain.get_latest
+        app_module._put_solicitacao_with_latest = domain.put_solicitacao_with_latest
+        app_module._confirm_payment = domain.confirm_payment
 
         yield tbl
 
