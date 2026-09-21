@@ -36,16 +36,19 @@ Cada solicitação grava **dois** itens (histórico depois ponteiro):
 - **Confirmar pagamento** atualiza histórico e depois `LATEST` (condition em `active_request_id`).
 - Writes ordenados (`put`/`update`) de propósito neste PR — TransactWrite fica pra um follow-up se precisar atomicidade forte.
 
-### Testes
+### Testes / check local
 
 ```bash
 pip install -r requirements.txt
+pip install -r cdk/requirements.txt   # só se for rodar synth
 PYTHONPATH=. pytest tests/test_exclusao.py -v
+# ou o caminho curto (pytest + cdk synth, sem deploy):
+make check
 ```
 
 Usa **moto** (sem AWS real). O pacote `lambda/` importa via `importlib` (nome reservado).
 
-CI (GitHub Actions): mesmo comando em Python 3.12 em todo PR/`push` na `main` — sem credenciais AWS no runner.
+CI (GitHub Actions): em todo PR/`push` na `main` — job **`test`** (pytest/moto, Python 3.12) e job **`synth`** (`npx aws-cdk@2 synth`, sem credenciais AWS / sem deploy).
 
 ---
 
