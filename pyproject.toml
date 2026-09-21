@@ -1,0 +1,30 @@
+[project]
+name = "aws-lambda-api-gateway-python"
+version = "0.0.0"
+requires-python = ">=3.12"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["lambda", "tests", "cdk"]
+
+[tool.ruff.lint]
+# Minimal hard constraints (Lauren): catch real footguns without rewriting the app.
+select = ["E", "F", "I", "W"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["E402"]
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
+warn_return_any = false
+warn_unused_configs = true
+check_untyped_defs = false
+# Package dir named `lambda` is a reserved word; typecheck tests + cdk first.
+files = ["tests", "cdk"]
+
+[[tool.mypy.overrides]]
+module = "lambda.*"
+ignore_errors = true
