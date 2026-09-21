@@ -1,6 +1,8 @@
 # Changelog
 
-## [Unreleased]
-- Adição de arquivos de documentação completa.
+Histórico útil: merges na `main` + ADRs em `docs/adr/`.
 
-Gerado por Grok Capitão.
+## Unreleased
+
+- Agent-friendly: `make check`, CI `lint`/`test`/`synth` (ruff + mypy + pytest + cdk synth)
+- ADR-001 Accepted — canônico unificado; Cognito JWT; pointer LATEST
