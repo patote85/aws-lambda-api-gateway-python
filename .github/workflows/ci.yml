@@ -29,3 +29,29 @@ jobs:
       - name: Run pytest
         # moto mocks DynamoDB — no AWS credentials required
         run: PYTHONPATH=. pytest tests/test_exclusao.py -v
+
+  synth:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: cdk/requirements.txt
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install CDK Python deps
+        run: pip install -r cdk/requirements.txt
+
+      - name: CDK synth
+        # No deploy; placeholder account/region — no AWS credentials
+        env:
+          CDK_DEFAULT_ACCOUNT: "111111111111"
+          CDK_DEFAULT_REGION: us-east-1
+          AWS_DEFAULT_REGION: us-east-1
+        run: npx --yes aws-cdk@2 synth

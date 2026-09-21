@@ -45,7 +45,16 @@ PYTHONPATH=. pytest tests/test_exclusao.py -v
 
 Usa **moto** (sem AWS real). O pacote `lambda/` importa via `importlib` (nome reservado).
 
-CI (GitHub Actions): mesmo comando em Python 3.12 em todo PR/`push` na `main` — sem credenciais AWS no runner.
+CI (GitHub Actions): job `test` (pytest+moto, Python 3.12) e job `synth` (`npx aws-cdk@2 synth`, sem deploy) em todo PR/`push` na `main` — sem credenciais AWS no runner.
+
+### Check local
+
+```bash
+pip install -r requirements.txt -r cdk/requirements.txt
+make check   # pytest (igual ao CI) + npx aws-cdk@2 synth (sem deploy)
+```
+
+Requer Node (para `npx`). Só `make test` ou `make synth` se quiser isolar.
 
 ---
 
