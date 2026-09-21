@@ -40,15 +40,16 @@ Cada solicitação grava **dois** itens (histórico depois ponteiro):
 
 ```bash
 pip install -r requirements.txt
+pip install -r requirements-dev.txt   # ruff + mypy
 pip install -r cdk/requirements.txt   # só se for rodar synth
 PYTHONPATH=. pytest tests/test_exclusao.py -v
-# ou o caminho curto (pytest + cdk synth, sem deploy):
+# caminho curto (lint + types + pytest + cdk synth, sem deploy):
 make check
 ```
 
 Usa **moto** (sem AWS real). O pacote `lambda/` importa via `importlib` (nome reservado).
 
-CI (GitHub Actions): em todo PR/`push` na `main` — job **`test`** (pytest/moto, Python 3.12) e job **`synth`** (`npx aws-cdk@2 synth`, sem credenciais AWS / sem deploy).
+CI (GitHub Actions): em todo PR/`push` na `main` — jobs **`lint`** (ruff + mypy), **`test`** (pytest/moto) e **`synth`** (`npx aws-cdk@2 synth`, sem AWS / sem deploy).
 
 ---
 
