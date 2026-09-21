@@ -9,8 +9,9 @@ line-length = 100
 src = ["lambda", "tests", "cdk"]
 
 [tool.ruff.lint]
-# Minimal hard constraints (Lauren): catch real footguns without rewriting the app.
-select = ["E", "F", "I", "W"]
+# Hard constraints (Lauren/pstack): errors + unused. Import-sort (I) deferred —
+# CDK multi-alias imports fight isort without value; enable in a later PR.
+select = ["E", "F", "W"]
 ignore = ["E501"]
 
 [tool.ruff.lint.per-file-ignores]
@@ -22,8 +23,8 @@ ignore_missing_imports = true
 warn_return_any = false
 warn_unused_configs = true
 check_untyped_defs = false
-# Package dir named `lambda` is a reserved word; typecheck tests + cdk first.
-files = ["tests", "cdk"]
+# `lambda/` is a reserved package name; CDK stubs are heavy — typecheck tests only for now.
+files = ["tests"]
 
 [[tool.mypy.overrides]]
 module = "lambda.*"
