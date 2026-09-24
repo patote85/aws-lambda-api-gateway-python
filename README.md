@@ -51,6 +51,11 @@ Usa **moto** (sem AWS real). O pacote `lambda/` importa via `importlib` (nome re
 
 CI (GitHub Actions): em todo PR/`push` na `main` — jobs **`lint`** (ruff + mypy), **`test`** (pytest/moto) e **`synth`** (`npx aws-cdk@2 synth`, sem AWS / sem deploy).
 
+### Agent-friendly / hard constraints
+
+- **Timezone-aware datetimes:** ruff `DTZ` (incl. DTZ003) — use `datetime.now(timezone.utc)`, never `datetime.utcnow()`.
+- **CORS:** CDK lab origins are localhost only (no `AllowOrigins: "*"`). Do not reintroduce wildcards in `cdk/`.
+
 ---
 
 ## CDK / Deploy

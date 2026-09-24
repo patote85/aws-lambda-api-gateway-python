@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from aws_lambda_powertools import Logger, Metrics, Tracer
 from aws_lambda_powertools.event_handler import APIGatewayHttpResolver
@@ -59,8 +59,8 @@ def solicitar_exclusao(event: APIGatewayProxyEvent):
         }
 
     request_id = str(uuid.uuid4())
-    timestamp = datetime.utcnow().isoformat()
-    expires_at = (datetime.utcnow() + timedelta(days=7)).isoformat()
+    timestamp = datetime.now(timezone.utc).isoformat()
+    expires_at = (datetime.now(timezone.utc) + timedelta(days=7)).isoformat()
     qr_code_data = domain.generate_pix_qr_code(cliente_id, domain.PIX_FEE, request_id)
 
     domain.put_solicitacao_with_latest(
