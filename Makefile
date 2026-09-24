@@ -5,7 +5,7 @@
 .PHONY: check test synth lint typecheck
 
 test:
-	PYTHONPATH=. pytest tests/test_exclusao.py -v
+	PYTHONPATH=. pytest tests/ -v
 
 lint:
 	ruff check lambda tests cdk

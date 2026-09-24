@@ -52,7 +52,7 @@ jobs:
 
       - name: Run pytest
         # moto mocks DynamoDB — no AWS credentials required
-        run: PYTHONPATH=. pytest tests/test_exclusao.py -v
+        run: PYTHONPATH=. pytest tests/ -v
 
   synth:
     runs-on: ubuntu-latest
