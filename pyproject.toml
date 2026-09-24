@@ -26,9 +26,6 @@ ignore_missing_imports = true
 warn_return_any = false
 warn_unused_configs = true
 check_untyped_defs = false
-# `lambda/` is a reserved package name; CDK stubs are heavy — typecheck tests only for now.
-files = ["tests"]
-
-[[tool.mypy.overrides]]
-module = "lambda.*"
-ignore_errors = true
+# Typecheck tests + domain_dynamo (HTTP app.py stays out — Powertools resolver cost).
+# No ignore_errors on domain.
+files = ["tests", "lambda/domain_dynamo.py"]
