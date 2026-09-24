@@ -17,7 +17,7 @@ lint:
 	ruff check lambda tests cdk
 
 typecheck:
-	mypy tests
+	mypy
 
 synth:
 	npx --yes aws-cdk@2 synth
