@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 
 import boto3
@@ -64,7 +64,7 @@ def put_solicitacao_with_latest(
 
 def confirm_payment(cliente_id: str, request_id: str) -> None:
     """Mark history + LATEST as PAID when pointer matches request_id."""
-    ts = datetime.utcnow().isoformat()
+    ts = datetime.now(timezone.utc).isoformat()
     table.update_item(
         Key={"cliente_id": cliente_id, "request_id": request_id},
         UpdateExpression="SET #status = :paid, updated_at = :ts",
