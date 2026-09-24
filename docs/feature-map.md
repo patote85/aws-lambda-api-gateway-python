@@ -36,17 +36,19 @@ HTTP lives in `lambda/app.py`. Dynamo LATEST helpers in `lambda/domain_dynamo.py
 
 No secrets in repo. Cognito IDs / `ApiUrl` only via CloudFormation outputs after deploy (CAB).
 
-## Pre-reqs — tests / check
+## Pre-reqs — tests / verify / check
+
+Prove-it-works path for agents: **`make verify`** (HTTP contracts in `tests/test_http_contract.py` via `lambda_handler`, including `GET /health` → 200). Full gate: **`make check`**.
 
 ```bash
 pip install -r requirements.txt
 pip install -r requirements-dev.txt   # ruff + mypy
 pip install -r cdk/requirements.txt   # for synth
-PYTHONPATH=. pytest tests/test_exclusao.py -v
-make check   # lint + typecheck + test + cdk synth (no deploy)
+make verify  # HTTP contracts (health + request/status/confirm)
+make check   # lint + typecheck + all tests + cdk synth (no deploy)
 ```
 
-CI jobs on PR/`push` to `main`: **lint** (ruff + mypy), **test** (pytest/moto), **synth** (`npx aws-cdk@2 synth`).
+CI jobs on PR/`push` to `main`: **lint** (ruff + mypy), **test** (pytest/moto), **verify** (`make verify`), **synth** (`npx aws-cdk@2 synth`).
 
 ## Hard constraints (encoded)
 
@@ -60,4 +62,4 @@ CI jobs on PR/`push` to `main`: **lint** (ruff + mypy), **test** (pytest/moto), 
 | [ADR-001](adr/ADR-001-unificar-exclusao-pix.md) | Canonical decision (monorepo, LATEST, Cognito) |
 | [ARCHITECTURE.md](../ARCHITECTURE.md) | Bounded context + components |
 | [SECURITY.md](../SECURITY.md) | Auth/CORS/throttle honesty |
-| [README.md](../README.md) | Deploy, Cognito lab curls, make check |
+| [README.md](../README.md) | Deploy, Cognito lab curls, make verify / make check |

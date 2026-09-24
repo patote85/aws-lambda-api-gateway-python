@@ -19,7 +19,7 @@ API serverless para solicitação de exclusão de cliente com geração de QR Co
 
 - [ADR-001 — Unificar exclusão Pix (CDK + Lambda)](docs/adr/ADR-001-unificar-exclusao-pix.md) — **Accepted** (CAB 2026-09-20). Este repo é o canônico; `aws-api-gateway-cdk` será arquivado após migrar o stack. Access pattern Dynamo: pointer `LATEST`. Auth (PR3): Cognito JWT.
 
-**Feature map (agents):** [docs/feature-map.md](docs/feature-map.md) — rotas, auth Cognito JWT, env vars, pré-reqs `make check`.
+**Feature map (agents):** [docs/feature-map.md](docs/feature-map.md) — rotas, auth Cognito JWT, env vars, pré-reqs `make verify` / `make check`.
 
 ---
 
@@ -38,20 +38,24 @@ Cada solicitação grava **dois** itens (histórico depois ponteiro):
 - **Confirmar pagamento** atualiza histórico e depois `LATEST` (condition em `active_request_id`).
 - Writes ordenados (`put`/`update`) de propósito neste PR — TransactWrite fica pra um follow-up se precisar atomicidade forte.
 
-### Testes / check local
+### Testes / check / verify local
 
 ```bash
 pip install -r requirements.txt
 pip install -r requirements-dev.txt   # ruff + mypy
 pip install -r cdk/requirements.txt   # só se for rodar synth
-PYTHONPATH=. pytest tests/test_exclusao.py -v
-# caminho curto (lint + types + pytest + cdk synth, sem deploy):
+# prove-it-works (HTTP contracts via lambda_handler, incl. GET /health):
+make verify
+# full gate (lint + types + all pytest + cdk synth, sem deploy):
 make check
 ```
 
 Usa **moto** (sem AWS real). O pacote `lambda/` importa via `importlib` (nome reservado).
 
-CI (GitHub Actions): em todo PR/`push` na `main` — jobs **`lint`** (ruff + mypy), **`test`** (pytest/moto) e **`synth`** (`npx aws-cdk@2 synth`, sem AWS / sem deploy).
+- **`make verify`** = `tests/test_http_contract.py` (agent-trusted HTTP status/body contracts).
+- **`make check`** = lint + typecheck + `pytest tests/` + cdk synth.
+
+CI (GitHub Actions): em todo PR/`push` na `main` — jobs **`lint`**, **`test`**, **`verify`** (`make verify`), e **`synth`** (sem AWS / sem deploy).
 
 ### Agent-friendly / hard constraints
 
