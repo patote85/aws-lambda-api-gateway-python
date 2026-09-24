@@ -9,9 +9,12 @@ line-length = 100
 src = ["lambda", "tests", "cdk"]
 
 [tool.ruff.lint]
-# Hard constraints (Lauren/pstack): errors + unused. Import-sort (I) deferred —
+# Hard constraints (Lauren/pstack): errors + unused + timezone-aware datetimes.
+# DTZ bans naive utcnow/utcfromtimestamp (DTZ003 etc.). Import-sort (I) deferred —
 # CDK multi-alias imports fight isort without value; enable in a later PR.
-select = ["E", "F", "W"]
+# CORS AllowOrigins "*" is already avoided in cdk/app.py (localhost only) —
+# do not reintroduce wildcard origins in CDK.
+select = ["E", "F", "W", "DTZ"]
 ignore = ["E501"]
 
 [tool.ruff.lint.per-file-ignores]
