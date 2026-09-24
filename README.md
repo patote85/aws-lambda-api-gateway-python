@@ -19,6 +19,8 @@ API serverless para solicitação de exclusão de cliente com geração de QR Co
 
 - [ADR-001 — Unificar exclusão Pix (CDK + Lambda)](docs/adr/ADR-001-unificar-exclusao-pix.md) — **Accepted** (CAB 2026-09-20). Este repo é o canônico; `aws-api-gateway-cdk` será arquivado após migrar o stack. Access pattern Dynamo: pointer `LATEST`. Auth (PR3): Cognito JWT.
 
+**Feature map (agents):** [docs/feature-map.md](docs/feature-map.md) — rotas, auth Cognito JWT, env vars, pré-reqs `make check`.
+
 ---
 
 ## DynamoDB — ponteiro LATEST
