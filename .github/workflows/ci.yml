@@ -54,6 +54,23 @@ jobs:
         # moto mocks DynamoDB — no AWS credentials required
         run: PYTHONPATH=. pytest tests/ -v
 
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: make verify
+        # HTTP contracts via lambda_handler (GET /health + request/status/confirm)
+        run: make verify
+
   synth:
     runs-on: ubuntu-latest
     steps:
