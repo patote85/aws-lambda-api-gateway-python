@@ -7,9 +7,9 @@ ADRs ficam em `docs/adr/` do repo canônico `patote85/aws-lambda-api-gateway-pyt
 | ADR | Título | Status | Escopo |
 |-----|--------|--------|--------|
 | [ADR-001](./ADR-001-unificar-exclusao-pix.md) | Unificar exclusão Pix (CDK + Lambda) | Accepted (CAB 2026-09-20) | Exclusão Pix |
-| [ADR-002](./ADR-002-auth-cognito-jwt-httpapi.md) | Auth padrão: Cognito JWT authorizer no HttpApi | Proposed | Todos os repos |
-| [ADR-003](./ADR-003-httpapi-lambda-cdk-python.md) | HttpApi + Lambda, IaC em CDK Python | Proposed | Todos os repos |
-| [ADR-004](./ADR-004-bend-jev-gate-nao-runtime.md) | Bend (e JEV) como gate no CI, não runtime | Proposed | Repos com Bend/JEV |
+| [ADR-002](./ADR-002-auth-cognito-jwt-httpapi.md) | Auth padrão: Cognito JWT authorizer no HttpApi | Accepted (CAB 2026-10-18) | Todos os repos |
+| [ADR-003](./ADR-003-httpapi-lambda-cdk-python.md) | HttpApi + Lambda, IaC em CDK Python | Accepted (CAB 2026-10-18) | Todos os repos |
+| [ADR-004](./ADR-004-bend-jev-gate-nao-runtime.md) | Bend (e JEV) como gate no CI, não runtime | Accepted (CAB 2026-10-18) | Repos com Bend/JEV |
 
 ## Decisões registradas sem ADR (já estão no código ou são fato consumado)
 

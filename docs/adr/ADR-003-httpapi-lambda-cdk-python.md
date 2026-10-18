@@ -1,6 +1,6 @@
 # ADR-003 — Padrão serverless: API Gateway HttpApi + Lambda, IaC em CDK Python
 
-- **Status:** Proposed
+- **Status:** Accepted (CAB 2026-10-18)
 - **Data:** 2026-10-18
 - **Escopo:** todos os repos serverless do Rodrigo (padrão da squad)
 - **Decisor:** Chefe via CAB (aprovação) / Arquiteto (proposta)

@@ -1,6 +1,6 @@
 # ADR-004 — Bend (e JEV) são gate de verificação no CI, não runtime em produção
 
-- **Status:** Proposed
+- **Status:** Accepted (CAB 2026-10-18)
 - **Data:** 2026-10-18
 - **Escopo:** todos os repos que usam Bend ou JEV
 - **Decisor:** Chefe via CAB (aprovação) / Arquiteto (proposta)

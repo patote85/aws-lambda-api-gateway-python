@@ -1,6 +1,6 @@
 # ADR-002 — Auth padrão: Cognito JWT authorizer no HttpApi
 
-- **Status:** Proposed
+- **Status:** Accepted (CAB 2026-10-18)
 - **Data:** 2026-10-18
 - **Escopo:** todos os repos serverless do Rodrigo (padrão da squad)
 - **Decisor:** Chefe via CAB (aprovação) / Arquiteto (proposta)
