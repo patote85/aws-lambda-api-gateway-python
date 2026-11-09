@@ -2,6 +2,8 @@
 
 ADRs ficam em `docs/adr/` do repo canônico `patote85/aws-lambda-api-gateway-python`. Só ganha ADR o que vira padrão pra mais de um sistema ou um porquê que não aparece no código.
 
+ADR nova: copie o [TEMPLATE.md](./TEMPLATE.md). As seções marcadas como obrigatórias são checadas no CI.
+
 ## ADRs
 
 | ADR | Título | Status | Escopo |

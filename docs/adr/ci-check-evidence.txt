@@ -1,0 +1,21 @@
+ADR check fail -> pass evidence
+Command: python scripts/check_adr.py
+
+1. Broken fixture (expected: non-zero)
+   Root: a temp repo whose docs/adr/TEMPLATE.md is a copy of this repo's template.
+   File: docs/adr/ADR-005-broken.md has Contexto, Efeitos colaterais,
+   Consequências / trade-offs, and Alternativas descartadas.
+   It omits the **Status:** line and the Decisão heading.
+
+$ python scripts/check_adr.py --root <fixture>
+docs/adr/ADR-005-broken.md: missing **Status:** line
+docs/adr/ADR-005-broken.md: missing section "Decisão"
+ADR check failed: 2 problem(s).
+exit code: 1
+
+2. Real repository (expected: zero)
+   ADR-001 through ADR-004 are allowlisted; no later ADR exists yet.
+
+$ python scripts/check_adr.py
+ADR check passed: 0 checked, 4 exempt (ADR-001, ADR-002, ADR-003, ADR-004).
+exit code: 0

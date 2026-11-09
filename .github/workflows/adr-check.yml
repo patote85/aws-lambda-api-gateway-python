@@ -1,0 +1,33 @@
+name: ADR check
+
+on:
+  pull_request:
+    paths:
+      - "docs/adr/**"
+      - "scripts/check_adr.py"
+      - ".github/workflows/adr-check.yml"
+  push:
+    paths:
+      - "docs/adr/**"
+      - "scripts/check_adr.py"
+      - ".github/workflows/adr-check.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: adr-check-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  adr-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check ADR status and required sections
+        run: python scripts/check_adr.py
